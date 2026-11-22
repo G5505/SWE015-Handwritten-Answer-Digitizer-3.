@@ -1,0 +1,9 @@
+{
+    "model": "CNN",
+    "dataset": "EMNIST Balanced",
+    "test_accuracy": 0.8745212554931641,
+    "test_loss": 0.36357247829437256,
+    "model_size_mb": 2.6724939346313477,
+    "avg_latency_ms": 10.04202373998396,
+    "latency_runs": 100
+}

@@ -1,0 +1,7 @@
+{
+    "model": "CNN INT8",
+    "test_accuracy": 0.8742553191489362,
+    "model_size_mb": 0.2309112548828125,
+    "avg_latency_ms": 0.20227890000342086,
+    "latency_runs": 100
+}

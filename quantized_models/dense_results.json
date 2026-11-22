@@ -1,0 +1,9 @@
+{
+    "model": "Dense Neural Network",
+    "dataset": "EMNIST Balanced",
+    "test_accuracy": 0.7434042692184448,
+    "test_loss": 0.8708474040031433,
+    "model_size_mb": 0.9400806427001953,
+    "avg_latency_ms": 10.891091639998649,
+    "latency_runs": 100
+}

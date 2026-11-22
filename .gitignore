@@ -1,0 +1,36 @@
+
+# Python temporary files
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Large AI models
+*.keras
+*.h5
+*.tflite
+*.pt
+*.pth
+*.safetensors
+
+# Backup archives
+*.zip
+SWE015_Models_Backup/
+
+# Generated files
+uploads/
+cnn_savedmodel/
+cnn_inference_savedmodel/
+
+# Editor and OS files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local cache
+.cache/
+
+SWE015_Model_Weights/
+SWE015_Model_Weights.zip
+utils/preprocess_signature.py

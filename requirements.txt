@@ -1,0 +1,12 @@
+
+flask
+numpy
+opencv-python
+tensorflow
+keras
+torch
+transformers
+nltk
+rapidfuzz
+scikit-learn
+gdown
