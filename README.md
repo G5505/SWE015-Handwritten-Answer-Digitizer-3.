@@ -1,150 +1,156 @@
-
 # SWE015 – Intelligent Handwritten Answer Digitizer
 
 ## Project Overview
 
-An AI-powered web application that recognizes handwritten
-digits and letters and corrects misspelled words using
-Natural Language Processing and a quantized BERT model.
+An AI-powered web application for recognizing handwritten digits and short English words and correcting recognition errors using classical Natural Language Processing (NLP) and a quantized BERT model.
 
-The application supports image uploads and handwritten
-drawing through an interactive canvas.
+Users can upload images or draw directly on an interactive canvas. The system segments handwritten characters, recognizes them, and uses sentence context to improve word correction.
 
 ## Main Features
 
-- Handwritten digit recognition
-- Handwritten letter and short-word recognition
+- Handwritten digit and letter recognition
+- Drawing canvas and image upload
 - Character segmentation using OpenCV
-- Minimum Edit Distance spelling candidates
+- Minimum Edit Distance candidate generation
 - Smoothed bigram language model
-- Context-aware BERT masked-language-model reranking
-- Quantized INT8 BERT for word correction
-- Quantized INT8 CNN for EMNIST character classification
-- CNN Grad-CAM visualization developed in the notebook
+- BERT masked-language-model candidate reranking
+- Dynamic INT8 quantization of BERT
+- INT8 CNN trained on EMNIST Balanced
+- Grad-CAM visualization in the training notebook
 
-## AI Models
+## AI Models and Architecture
 
-| Model | Purpose |
+| Component | Purpose |
 |---|---|
-| Dense Neural Network | EMNIST baseline comparison |
-| CNN | EMNIST character classification |
-| CNN INT8 | Quantized character classification |
-| Classical NLP | Candidate generation and n-gram ranking |
-| BERT | Context-based candidate reranking |
-| BERT INT8 | Efficient contextual word correction |
+| Dense Neural Network | EMNIST character classification baseline |
+| CNN | Improved EMNIST character classification |
+| CNN INT8 | Quantized CNN available through a testing endpoint |
+| Minimum Edit Distance | Spelling candidate generation |
+| N-gram Language Model | Classical candidate ranking |
+| BERT | Context-aware masked-language-model reranking |
+| BERT INT8 | Quantized contextual correction in the Flask application |
 
-The current Digit and Letter interface uses the existing
-recognition models. The EMNIST INT8 CNN is accessible
-through a separate testing endpoint.
+**Current application pipeline:**
 
-The application uses quantized BERT in its letter
-correction pipeline.
+Handwritten Input → Image Preprocessing → Character Segmentation → Handwriting Recognition → Minimum Edit Distance → N-gram Candidates → Quantized BERT Reranking → Corrected Word
 
-## Technology Stack
+The Digit and Letter interface currently uses the existing recognition models. The separately trained EMNIST INT8 CNN is accessible through `/predict-emnist-test`. The application uses quantized BERT for contextual correction in Letter mode.
 
-- Python and Flask
-- TensorFlow / Keras
-- TensorFlow Lite
-- PyTorch
-- Hugging Face Transformers
-- OpenCV
-- NLTK
-- RapidFuzz
-- HTML, CSS and JavaScript
+## Technologies
 
-## Setup
+Python, Flask, TensorFlow, Keras, TensorFlow Lite, PyTorch, Hugging Face Transformers, NLTK, RapidFuzz, OpenCV, HTML, CSS, and JavaScript.
 
-Recommended environment: Python 3.13 on Windows.
+## Installation and Setup
 
-### 1. Install dependencies
+**Tested development environment:** Windows, Python 3.13, CPU.
 
-    python -m pip install -r requirements.txt
+### 1. Clone the repository
 
-### 2. Download NLTK data
+```bash
+git clone YOUR_GITHUB_REPOSITORY_URL
+cd SWE015-Handwritten-Answer-Digitizer
+```
 
-    python -m nltk.downloader brown
+### 2. Install dependencies
 
-### 3. Download model weights
+```bash
+python -m pip install -r requirements.txt
+```
 
-Model weights are excluded from GitHub due to file size.
+### 3. Download the Brown Corpus
 
+```bash
+python -m nltk.downloader brown
+```
 
-Model download link: [Download SWE015 Model Weights](https://drive.google.com/file/d/1kb03-IMr5MeoRTBEFF8pP3X2RxD7juCi/view?usp=sharing)
+### Run the application
 
-Place the required files in these locations:
+python run.py
 
-    models/
-        digits_model.keras
-        letters_model.keras
+The launcher automatically downloads missing model weights
+from Google Drive and installs them in the required folders.
+An internet connection is required for the first setup.
 
-    quantized_models/
-        swe015_cnn_int8.tflite
-        bert_int8_weights.pt
+**Model weights backup:**
 
-The original EMNIST Dense and CNN weights are also
-available in the model backup for reproducibility.
+[Download SWE015 Model Weights](https://drive.google.com/file/d/1kb03-IMr5MeoRTBEFF8pP3X2RxD7juCi/view?usp=sharing)
 
-### 4. Run the application
+If automatic downloading fails, download the ZIP manually and extract:
 
-    python aqq.py
+- `digits_model.keras` and `letters_model.keras` into `models/`
+- `swe015_cnn_int8.tflite` and `bert_int8_weights.pt` into `quantized_models/`
 
-Open:
+The BERT tokenizer and configuration may also require an internet connection on the first run.
 
-    http://127.0.0.1:5001
+Open the local application:
 
-## How to Use
+http://127.0.0.1:5001
+
+## Using the Application
 
 1. Select Digit or Letter mode.
-2. Draw handwritten input or upload an image.
-3. For Letter mode, provide sentence context using [MASK].
-4. Click Predict.
-5. View the raw recognition and corrected word.
+2. Upload an image or draw a handwritten input.
+3. In Letter mode, enter a sentence containing `[MASK]`.
+4. Click **Predict**.
+5. View the recognized characters, corrected word, confidence, and correction method.
 
-Example:
+**Example from a local test:**
 
-    Input: HELO
-    Context: I said [MASK] to my friend.
-    Correction: HELLO
+Raw recognition: `HELO`
 
-## Experiments
+Sentence context: `I said [MASK] to my friend.`
 
-Models were trained and evaluated using EMNIST Balanced.
+Corrected word: `HELLO`
 
-Measured character classification results:
+## Experimental Results
 
-| Model | Test Accuracy |
-|---|---|
-| Dense | 74.34% |
-| CNN | 87.45% |
-| CNN INT8 | 87.43% |
+Models were trained and evaluated on EMNIST Balanced, containing 47 character classes.
 
-These are character-level test results, not word-level
-correction accuracy.
+| Model | Character Accuracy | Size | Average Inference Latency |
+|---|---:|---:|---:|
+| Dense Neural Network | 74.34% | 0.94 MB | 10.89 ms |
+| CNN | 87.45% | 2.67 MB | 10.04 ms |
+| CNN INT8 | 87.43% | 0.23 MB | 0.20 ms |
 
-Additional benchmarks and training experiments are
-documented in SWE015_Model_Training.ipynb.
+Latency values were obtained in Google Colab over 100 runs. The original Keras and INT8 TensorFlow Lite models used different inference paths, so their latency measurements are not a controlled like-for-like comparison.
 
-## Limitations
+### BERT Quantization
 
-- Handwriting recognition depends on segmentation
-  and image preprocessing.
-- The original web recognition models and the EMNIST
-  models are different.
-- Contextual correction depends on the supplied sentence.
-- The application currently supports short English words.
+| Metric | BERT FP32 | BERT INT8 |
+|---|---:|---:|
+| Model Size | 417.84 MB | 195.57 MB |
+| Average Latency | 196.87 ms | 109.64 ms |
+
+BERT latency was measured in Google Colab on CPU over 100 runs using the same masked sentence.
+
+The quantized model retained the same top candidate, `hello`, in the tested example. This single test does not establish equal overall word-correction accuracy.
+
+## Evaluation Limitations
+
+- Character recognition results are not equivalent to word-correction accuracy.
+- The web interface's existing recognizers and the EMNIST-trained CNN are separate models.
+- Handwriting accuracy depends on image quality, character segmentation, and preprocessing.
+- BERT corrections depend on the sentence context.
+- The current system is focused on short English words.
+- Grad-CAM was generated in the training notebook but is not yet displayed in the web interface.
+
+## Reproducibility
+
+Training and experimental code are documented in `SWE015_Model_Training.ipynb`.
+
+The original trained Dense and CNN models are separate from the models required to run the Flask application.
 
 ## AI Usage Statement
 
-ChatGPT was used for coding assistance, debugging,
-integration guidance, and documentation drafting.
+ChatGPT was used for coding assistance, troubleshooting, model integration guidance, and documentation drafting.
 
-Model training, execution, testing and reported results
-were performed in the project environment.
+The experiments and measurements reported above were executed in the project environment. The project author is responsible for understanding, verifying, and explaining the submitted code and results.
 
 ## References
 
-- EMNIST: https://www.nist.gov/itl/products-and-services/emnist-dataset
-- NLTK: https://www.nltk.org/
-- BERT: https://huggingface.co/google-bert/bert-base-uncased
-- Flask: https://flask.palletsprojects.com/
-- PyTorch: https://pytorch.org/
+- [NIST – EMNIST Dataset](https://www.nist.gov/itl/products-and-services/emnist-dataset)
+- [Hugging Face – BERT Base Uncased](https://huggingface.co/google-bert/bert-base-uncased)
+- [NLTK Documentation](https://www.nltk.org/)
+- [TensorFlow Lite Quantization](https://ai.google.dev/edge/litert/models/post_training_integer_quant)
+- [PyTorch Quantization](https://docs.pytorch.org/docs/stable/quantization.html)
+- [Flask Documentation](https://flask.palletsprojects.com/)
